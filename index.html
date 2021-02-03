@@ -1,0 +1,226 @@
+<html>
+  <head>
+    <title>Core oefeningen</title>
+    <style>
+      .container {
+        background: #FF5722;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: black;
+      }
+
+      * {
+        touch-action: none;
+      }
+
+      .container {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      .countdown {
+        display: block;
+        width: 66vmin;
+        height: 66vmin;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Oswald", sans-serif;
+        font-weight: 400;
+        font-size: 25vmin;
+        border-radius: 50%;
+        overflow: hidden;
+        cursor: pointer;
+        transition: width, height, border-radius, font-size;
+        transition-duration: 0.2s;
+      }
+      .countdown--ended {
+        -webkit-animation: buzz 0.5s;
+                animation: buzz 0.5s;
+      }
+      .countdown:active {
+        transform: scale(1.02);
+      }
+      @-webkit-keyframes buzz {
+        0% {
+          transform: rotate(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+          transform: rotate(6deg);
+        }
+        20%, 40%, 60%, 80% {
+          transform: rotate(-6deg);
+        }
+        100% {
+          transform: rotate(0);
+        }
+      }
+      @keyframes buzz {
+        0% {
+          transform: rotate(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+          transform: rotate(6deg);
+        }
+        20%, 40%, 60%, 80% {
+          transform: rotate(-6deg);
+        }
+        100% {
+          transform: rotate(0);
+        }
+      }
+      .countdown--wide {
+        width: 100%;
+        height: 100%;
+        font-size: 50vmin;
+        border-radius: 0;
+      }
+
+      .countdown__fill {
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        opacity: 1;
+      }
+      
+      .image {
+        height: 100%;
+        background: url(images/title.png) no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+      }
+
+      .countdown__digit {
+        width: 100%;
+        color: #FF5722;
+        text-align: center;
+        mix-blend-mode: difference;
+        pointer-events: none;
+        -webkit-user-select: none;
+          -moz-user-select: none;
+            -ms-user-select: none;
+                user-select: none;
+      }
+      .countdown__buttons {
+        position: absolute;
+        right: 50px;
+        top: 50%;
+        height: 200px;
+        margin-top: -100px;
+        color: white;
+        z-index: 1;
+      }
+      .countdown__button {
+        height: 50%;
+      }
+
+      .full-button {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        padding: 1em 0.5em 0.5em 2em;
+        font-family: "Oswald", sans-serif;
+        text-transform: uppercase;
+        color: black;
+        cursor: pointer;
+        font-size: 84px;
+      }
+    </style>
+  </head>
+  <body class="center">
+
+    <div class="container">
+      <div class="countdown countdown--wide" id="countdown">
+        <div class="countdown__fill" id="ticker">
+          <div class="image"></div>
+        </div>
+        <div class="countdown__digit" id="seconds"></div>
+      </div>
+    </div><a class="full-button" id="next">Volgende</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script>
+      const hammerHandler = new Hammer(document.querySelector('.countdown'));
+      const image = document.querySelector('.image')
+      const counter = document.querySelector('.countdown__digit')
+      let imageSet = false
+      let duration = 30000
+      let interval = null
+      let current_time = null
+      let running = false
+
+      const nextImage = () => {
+        imageSet = true
+        const image = document.querySelector('.image')
+        image.setAttribute('style', 'background: url(images/card-'+Math.floor(Math.random() * (79 - 1) + 1)+'.png); background-position: center center; background-repeat: no-repeat; background-size: cover; height: 100%;')
+      }
+
+      document.querySelector('#next').addEventListener('click', () => {
+        current_time = duration
+        counter.innerHTML = current_time / 1000
+        nextImage()
+      })
+      
+      // hammerHandler.get('pan').set({ direction: Hammer.DIRECTION_VERTICAL })
+      // hammerHandler.on('panup pandown', function(ev) {
+      //   if (!running) {
+      //     if (ev.direction === Hammer.DIRECTION_UP && duration < 999000) {
+      //       duration+=1000
+      //     } else if (ev.direction === Hammer.DIRECTION_DOWN && duration > 0) {
+      //       duration-=1000
+      //     }
+      //   }
+      // })
+
+      hammerHandler.on('tap', function() {
+        if(!imageSet) {
+          current_time = duration
+          nextImage()
+        }
+        
+        timer()
+        running = !running
+      })
+
+      const timer = () => {
+        if(running) {
+          clearInterval(interval)
+          counter.innerHTML = current_time / 1000
+        } else {
+          counter.innerHTML = current_time / 1000
+          current_time-=1000
+
+          interval = setInterval(() => {
+            if(current_time <= -1000) {
+              nextImage()
+              current_time = duration
+              counter.innerHTML = current_time / 1000
+              return
+            }
+            counter.innerHTML = current_time / 1000
+            current_time-=1000
+          }, 1000)
+        }
+      }
+    </script>
+  </body>
+</html>
